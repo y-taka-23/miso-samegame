@@ -18,8 +18,8 @@ before_install:
 
 # install GHC
 install:
-- stack --no-terminal --install-ghc build --only-dependencies
+- stack --no-terminal setup
 
 # build project
 script:
-- stack --no-terminal --skip-ghc-check build
+- stack --no-terminal build
