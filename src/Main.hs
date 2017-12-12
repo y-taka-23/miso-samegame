@@ -18,6 +18,7 @@ main = startApp App {..}
         view          = viewField
         subs          = []
         events        = defaultEvents
+        mountPoint    = Nothing
 
 updateField :: Action -> Field -> Effect Action Field
 updateField = undefined
