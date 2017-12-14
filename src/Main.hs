@@ -24,7 +24,7 @@ main = startApp App {..}
         mountPoint    = Nothing
 
 updateField :: Action -> Field -> Effect Action Field
-updateField (Knowkout pos) = noEff . sweep . (mark pos)
+updateField (Knockout pos) = noEff . sweep . (mark pos)
 updateField NoOp           = noEff
 
 mark :: Position -> Field -> Field
