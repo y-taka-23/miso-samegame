@@ -1,7 +1,11 @@
 {-# LANGUAGE RecordWildCards #-}
 module Main where
 
-import Data.Maybe ( isJust )
+import Safe                      ( atMay )
+import Control.Lens              ( (.=), ix )
+import Control.Monad             ( when )
+import Control.Monad.Trans.State ( State, get, execState )
+import Data.Maybe                ( isJust )
 import Miso
 
 data Action
@@ -28,7 +32,25 @@ updateField (Knockout pos) = noEff . sweep . (mark pos)
 updateField NoOp           = noEff
 
 mark :: Position -> Field -> Field
-mark = undefined
+mark pos field =
+    case colorOf pos field of
+        Just color -> execState (markWithColor color pos) field
+        Nothing    -> field
+
+-- Todo: Use Lenses
+colorOf ::  Position -> Field -> Maybe Color
+colorOf (i, j) field = do
+    mColumn <- field `atMay` i
+    mColor  <- mColumn `atMay` j
+    mColor
+
+markWithColor :: Color -> Position -> State Field ()
+markWithColor color (i, j) = do
+    mColor <- colorOf (i, j) <$> get
+    when (mColor == Just color) $ do
+        ix i . ix j .= Nothing
+        mapM_ (markWithColor color)
+            [(i + 1, j), (i - 1, j), (i, j + 1), (i, j - 1)]
 
 sweep :: Field -> Field
 sweep = filter (not . null) . map (filter isJust)
