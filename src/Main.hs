@@ -5,7 +5,7 @@ import Safe                      ( atMay )
 import Control.Lens              ( (.=), ix )
 import Control.Monad             ( when )
 import Control.Monad.Trans.State ( State, get, execState )
-import Data.Maybe                ( isJust )
+import Data.Maybe                ( catMaybes )
 import Miso
 
 data Action
@@ -13,7 +13,8 @@ data Action
     | Knockout Position
 
 type Color = Int
-type Field = [[Maybe Color]]
+type Field = [[Color]]
+type MarkedField = [[Maybe Color]]
 type Position = (Int, Int)
 
 main :: IO ()
@@ -31,20 +32,21 @@ updateField :: Action -> Field -> Effect Action Field
 updateField (Knockout pos) = noEff . sweep . (mark pos)
 updateField NoOp           = noEff
 
-mark :: Position -> Field -> Field
+mark :: Position -> Field -> MarkedField
 mark pos field =
-    case colorOf pos field of
-        Just color -> execState (markWithColor color pos) field
-        Nothing    -> field
+    let mField = map (map Just) field
+    in case colorOf pos mField of
+        Just color -> execState (markWithColor color pos) mField
+        Nothing    -> mField
 
 -- Todo: Use Lenses
-colorOf ::  Position -> Field -> Maybe Color
-colorOf (i, j) field = do
-    mColumn <- field `atMay` i
+colorOf ::  Position -> MarkedField -> Maybe Color
+colorOf (i, j) mField = do
+    mColumn <- mField `atMay` i
     mColor  <- mColumn `atMay` j
     mColor
 
-markWithColor :: Color -> Position -> State Field ()
+markWithColor :: Color -> Position -> State MarkedField ()
 markWithColor color (i, j) = do
     mColor <- colorOf (i, j) <$> get
     when (mColor == Just color) $ do
@@ -52,8 +54,8 @@ markWithColor color (i, j) = do
         mapM_ (markWithColor color)
             [(i + 1, j), (i - 1, j), (i, j + 1), (i, j - 1)]
 
-sweep :: Field -> Field
-sweep = filter (not . null) . map (filter isJust)
+sweep :: MarkedField -> Field
+sweep = filter (not . null) . map catMaybes
 
 viewField :: Field -> View Action
 viewField = undefined
