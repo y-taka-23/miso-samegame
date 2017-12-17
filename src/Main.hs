@@ -6,7 +6,9 @@ import Control.Lens              ( (.=), ix )
 import Control.Monad             ( when )
 import Control.Monad.Trans.State ( State, get, execState )
 import Data.Maybe                ( catMaybes )
+import Data.List                 ( intercalate )
 import Miso
+import Miso.String               ( ms )
 
 data Action
     = NoOp
@@ -59,3 +61,8 @@ sweep = filter (not . null) . map catMaybes
 
 viewField :: Field -> View Action
 viewField = undefined
+
+viewBlock :: Position -> Color -> View Action
+viewBlock (i, j) color = div_ [ id_ (ms selector) ] []
+    where
+        selector = intercalate "-" ["block", show i, show j, show color]
