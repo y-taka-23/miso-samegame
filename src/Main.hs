@@ -71,7 +71,7 @@ viewField field = div_ [ id_ "field" ] blocks
       index j (co : cos) = zipWith (index' j) [0..] co ++ index (j + 1) cos
 
       index' :: Int -> Int -> Color -> (Position, Color)
-      index' j i color = ((i, j), color) ]
+      index' j i color = ((i, j), color)
 
 viewBlock :: Position -> Color -> View Action
 viewBlock (i, j) color = div_ [ id_ (ms selector) ] []
