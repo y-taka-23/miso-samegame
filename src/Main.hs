@@ -1,4 +1,5 @@
-{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards   #-}
 module Main where
 
 import Safe                      ( atMay )
@@ -60,7 +61,17 @@ sweep :: MarkedField -> Field
 sweep = filter (not . null) . map catMaybes
 
 viewField :: Field -> View Action
-viewField = undefined
+viewField field = div_ [ id_ "field" ] blocks
+    where
+      blocks :: [View Action]
+      blocks = map (uncurry viewBlock) $ index 0 field
+
+      index :: Int -> Field -> [(Position, Color)]
+      index _ []         = []
+      index j (co : cos) = zipWith (index' j) [0..] co ++ index (j + 1) cos
+
+      index' :: Int -> Int -> Color -> (Position, Color)
+      index' j i color = ((i, j), color) ]
 
 viewBlock :: Position -> Color -> View Action
 viewBlock (i, j) color = div_ [ id_ (ms selector) ] []
