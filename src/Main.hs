@@ -8,8 +8,10 @@ import Control.Monad             ( when )
 import Control.Monad.Trans.State ( State, get, execState )
 import Data.Maybe                ( catMaybes )
 import Data.List                 ( intercalate )
+import Data.List.Split           ( chunksOf )
 import Miso
 import Miso.String               ( ms )
+import System.Random.MWC         ( createSystemRandom, uniformR )
 
 data Action
     = NoOp
@@ -21,15 +23,33 @@ type MarkedField = [[Maybe Color]]
 type Position = (Int, Int)
 
 main :: IO ()
-main = startApp App {..}
+main = do
+    initialField <- generateField
+    startApp App { model = initialField, ..}
     where
         initialAction = NoOp
-        model         = undefined
         update        = updateField
         view          = viewField
         subs          = []
         events        = defaultEvents
         mountPoint    = Nothing
+
+-- Todo: Make the configus changeable
+fieldWidth :: Int
+fieldWidth  = 10
+
+fieldHeight :: Int
+fieldHeight = 7
+
+numOfColors :: Int
+numOfColors = 5
+
+generateField :: IO Field
+generateField = do
+    gen    <- createSystemRandom
+    colors <- sequence $ replicate (fieldWidth * fieldHeight) $
+        uniformR (0, numOfColors - 1) gen
+    return $ chunksOf fieldHeight colors
 
 updateField :: Action -> Field -> Effect Action Field
 updateField (Knockout pos) = noEff . sweep . (mark pos)
