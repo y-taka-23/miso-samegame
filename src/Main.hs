@@ -94,6 +94,10 @@ viewField field = div_ [ id_ "field" ] blocks
       index' j i color = ((i, j), color)
 
 viewBlock :: Position -> Color -> View Action
-viewBlock (i, j) color = div_ [ id_ (ms selector) ] []
-    where
-        selector = intercalate "-" ["block", show i, show j, show color]
+viewBlock (i, j) color =
+    div_
+        [ id_    . ms $ intercalate "-" ["position", show i, show j]
+        , class_ . ms $ "block color-" ++ show color
+        ]
+        [ text . ms $ show color
+        ]
