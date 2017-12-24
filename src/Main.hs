@@ -59,8 +59,10 @@ mark :: Position -> Field -> MarkedField
 mark pos field =
     let mField = map (map Just) field
     in case colorOf pos mField of
-        Just color -> execState (markWithColor color pos) mField
-        Nothing    -> mField
+        Just color -> if isClustered pos mField
+            then execState (markWithColor color pos) mField
+            else mField
+        Nothing -> mField
 
 -- Todo: Use Lenses
 colorOf ::  Position -> MarkedField -> Maybe Color
@@ -68,6 +70,12 @@ colorOf (i, j) mField = do
     mColumn <- mField `atMay` i
     mColor  <- mColumn `atMay` j
     mColor
+
+-- Todo: integrate it in the marking logic
+isClustered :: Position -> MarkedField -> Bool
+isClustered (i, j) mField =
+    or $ map (\p -> colorOf p mField == colorOf (i, j) mField) $
+        [(i + 1, j), (i - 1, j), (i, j + 1), (i, j - 1)]
 
 markWithColor :: Color -> Position -> State MarkedField ()
 markWithColor color (i, j) = do
