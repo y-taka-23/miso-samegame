@@ -113,6 +113,7 @@ viewBlock (i, j) color =
     div_
         [ id_    . ms $ intercalate "-" ["position", show i, show j]
         , class_ . ms $ "block color-" ++ show color
+        , onClick $ Knockout (i, j)
         ]
         [ text . ms $ show color
         ]
