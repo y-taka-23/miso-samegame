@@ -22,14 +22,20 @@ type Field = [[Color]]
 type MarkedField = [[Maybe Color]]
 type Position = (Int, Int)
 
+data GameState = GameState
+    { field     :: Field
+    , score     :: Int
+    , bestScore :: Int
+    }
+
 main :: IO ()
 main = do
-    initialField <- generateField
-    startApp App { model = initialField, ..}
+    initialGame <- generateField
+    startApp App { model = initialGame, ..}
     where
         initialAction = NoOp
-        update        = updateField
-        view          = viewField
+        update        = updateGame
+        view          = viewGame
         subs          = []
         events        = defaultEvents
         mountPoint    = Nothing
@@ -51,9 +57,10 @@ generateField = do
         uniformR (0, numOfColors - 1) gen
     return $ chunksOf fieldHeight colors
 
-updateField :: Action -> Field -> Effect Action Field
-updateField (Knockout pos) = noEff . sweep . (mark pos)
-updateField NoOp           = noEff
+updateGame :: Action -> GameState -> Effect Action GameState
+updateGame (Knockout pos) (GameState _ _ field) =
+    GameState 0 0 $ (noEff . sweep . (mark pos)) field
+updateGame NoOp gs = noEff gs
 
 mark :: Position -> Field -> MarkedField
 mark pos field =
@@ -88,8 +95,8 @@ markWithColor color (i, j) = do
 sweep :: MarkedField -> Field
 sweep = filter (not . null) . map catMaybes
 
-viewField :: Field -> View Action
-viewField field = div_ [ id_ "field" ] blocks
+viewGame :: GameState -> View Action
+viewGame (GameState _ _ field) = div_ [ id_ "field" ] blocks
     where
       blocks :: [View Action]
       blocks = map (uncurry viewBlock) $ index 0 field
