@@ -1,1 +1,42 @@
 @import "reset";
+
+$field-color: #ccc;
+$field-height: 7;
+$field-width: 10;
+
+$block-colors: #c00, #0c0, #00c, #cc0, #c0c, #0cc;
+$block-padding: 2px;
+$block-size: 50px;
+
+#field {
+  background-color: $field-color;
+  height: $block-size * $field-height;
+  padding: $block-padding;
+  width: $block-size * $field-width;
+}
+
+.block {
+  background-clip: content-box;
+  height: $block-size - $block-padding * 2;
+  line-height: $block-size - $block-padding * 2;
+  padding: $block-padding;
+  text-align: center;
+  width: $block-size - $block-padding * 2;
+}
+
+@each $color in $block-colors {
+  $i: index($block-colors, $color);
+  .color-#{$i - 1} {
+    background-color: $color;
+  }
+}
+
+@for $i from 0 through ($field-width - 1) {
+  @for $j from 0 through ($field-height - 1) {
+    #position-#{$i}-#{$j} {
+      left: $block-size * $i + $block-padding;
+      position: absolute;
+      top: $block-size * ($field-height - $j - 1) + $block-padding;
+    }
+  }
+}
