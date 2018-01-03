@@ -2,16 +2,16 @@
 {-# LANGUAGE RecordWildCards   #-}
 module Main where
 
-import Safe                      ( atMay )
-import Control.Lens              ( (.=), ix )
-import Control.Monad             ( when )
-import Control.Monad.Trans.State ( State, get, execState )
-import Data.Maybe                ( catMaybes )
-import Data.List                 ( intercalate )
-import Data.List.Split           ( chunksOf )
-import Miso
-import Miso.String               ( ms )
-import System.Random.MWC         ( createSystemRandom, uniformR )
+import           Control.Lens              (ix, (.=))
+import           Control.Monad             (when)
+import           Control.Monad.Trans.State (State, execState, get)
+import           Data.List                 (intercalate)
+import           Data.List.Split           (chunksOf)
+import           Data.Maybe                (catMaybes)
+import           Miso
+import           Miso.String               (ms)
+import           Safe                      (atMay)
+import           System.Random.MWC         (createSystemRandom, uniformR)
 
 data Action
     = NoOp
