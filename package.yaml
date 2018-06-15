@@ -1,0 +1,19 @@
+name:     miso-samegame
+version:  '0.1.0.0'
+synopsis: SameGame written in GHCJS + Miso
+category: Web
+license:  UnspecifiedLicense
+
+dependencies:
+- base
+- lens
+- miso
+- mwc-random
+- safe
+- split
+- transformers
+
+executables:
+  samegame:
+    main:         Main.hs
+    source-dirs:  src
